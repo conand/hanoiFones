@@ -1,0 +1,7 @@
+architecture: ?
+service_name: ?
+type: ?
+description: ?
+flag_id_description: ?
+apt_dependencies: 
+    - ?
