@@ -5,19 +5,32 @@
 
 #define N 10
 #define TIME_WINDOW 120
-#define MAX_VALUE 1000
+#define MAX_VALUE 1500
+#define KEEP_PLAYING 1
+#define STOP_PLAYING 0
+#define NEW_OFFER_MAX_PLUS 10
+#define STOP_PLAYING 0
 
 
 float read_float(void){
     char input[16];
     int size;
+
     size = read(0, input, 15);
     input[15] = '\0'; 
 
     return (float) atof(input); 
 }
 
-void play(float *player_bet, float *user_bet){
+
+int make_new_offer(int player_bet){
+    float tmp = rand() % (MAX_VALUE * 2 / 3) + MAX_VALUE / 3;
+
+    return tmp > player_bet;
+}
+
+
+int play(float *player_bet, float *user_bet){
 
     do{
         printf("Best offer by now is %.2f$. You have to offer more!\n", *user_bet);
@@ -28,11 +41,23 @@ void play(float *player_bet, float *user_bet){
 
     } while(*player_bet <= *user_bet);
 
-    printf("You offered %.2f.\n", *player_bet);
-    *user_bet = *player_bet + (rand() % 10);
+    printf("You offered %.2f$.\n", *player_bet);
     
-    printf("\nA mysterious man made a new offer: %.2f.\n", *user_bet);
-    fflush(stdout);
+    if (*player_bet >= MAX_VALUE)
+        return STOP_PLAYING;
+
+    if (make_new_offer(*player_bet)){
+        *user_bet = *player_bet + (rand() % NEW_OFFER_MAX_PLUS) + 1;
+        printf("\nA mysterious man made a new offer: %.2f$.\n", *user_bet);
+        fflush(stdout);
+
+        if (*user_bet >= MAX_VALUE)
+            return STOP_PLAYING;
+    }
+    else
+        return STOP_PLAYING;
+
+    return KEEP_PLAYING;
 
 }
 
@@ -83,6 +108,7 @@ int main(){
     user_bet = 100 + (rand() % 50);
     keep_playing = 1;
 
+    counter = 0;
     while(time(NULL) - start_time < TIME_WINDOW && keep_playing){
         print_menu();
         choice = getchar();
@@ -90,25 +116,32 @@ int main(){
 
         switch (choice) {
             case '1':
-                play(&player_bet, &user_bet);
-                last_bets[counter % N] = player_bet;
+                keep_playing = play(&player_bet, &user_bet);
                 counter++;
+                last_bets[counter % N] = player_bet;
                 break;
             case '2':
-                keep_playing = 0;
-                counter--;
+                keep_playing = STOP_PLAYING;
                 break;
             default:
                 break;
         }
     }
 
-    printf("Last bets:\n");
+    if (player_bet > user_bet)
+        printf("\nCongratulations! You bought the (hano)iFon for %.2f$\n", player_bet);
+    else
+        printf("\nA mysterious man bought the (hano)iFon for %.2f$\n", user_bet);
+    fflush(stdout);
+
+    i = 0;
+    printf("Your last bets:\n");
     while (i < N && last_bets[counter % N]){
         printf("- %.2f\n", last_bets[counter % N]);
         counter--;
         i++;
     }
-
+    fflush(stdout);
+    
     return 0;
 }
