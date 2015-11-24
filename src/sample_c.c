@@ -3,10 +3,11 @@
 #include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
-#define N 15
+#define N 17
 #define TIME_WINDOW 120
-#define MAX_VALUE 150000
+#define MAX_VALUE 160000
 #define KEEP_PLAYING 1
 #define STOP_PLAYING 0
 #define NEW_OFFER_MAX_PLUS 10
@@ -15,6 +16,8 @@
 #define PASSWORD_SIZE 20
 #define IMEI_SIZE 50
 
+
+int8_t counter;
 
 int64_t read_int64_t(void){
     char input[16];
@@ -33,20 +36,21 @@ void rand_string(char *str, size_t size){
     if (size) {
         --size;
         for (n = 0; n < size; n++) {
-            int key = rand() % (int) (sizeof(charset) - 1);
+            int key = rand() % (int) (sizeof(charset));
             str[n] = charset[key];
         }
         str[size] = '\0';
     }
 }
 
-int make_new_offer(int64_t player_bet){
-    int64_t tmp = rand() % (MAX_VALUE * 2 / 3) + MAX_VALUE / 3;
+int make_new_offer(int64_t player_bet, int64_t max_value){
+    int64_t tmp = rand() % (max_value * 2 / 3) + max_value / 3;
 
     return tmp > player_bet;
 }
 
-int play(int64_t *player_bet, int64_t *user_bet, int64_t *last_bets, int8_t *counter){
+int play(int64_t *player_bet, int64_t *user_bet, int64_t *last_bets){
+    int64_t max_value = MAX_VALUE;
 
     do{
         printf("Best offer by now is %ld$. You have to offer more!\n", *user_bet);
@@ -55,24 +59,24 @@ int play(int64_t *player_bet, int64_t *user_bet, int64_t *last_bets, int8_t *cou
     
         *player_bet = read_int64_t();
 
-        (*counter)++;
-        last_bets[*counter % N] = *player_bet;
-        printf("%d - %p\n", *counter, last_bets + (*counter % N));
+        counter++;
+        last_bets[counter % N] = *player_bet;
+        printf("%d - %p\n", counter, last_bets + (counter % N));
         fflush(stdout);
 
     } while(*player_bet <= *user_bet);
 
     printf("You offered %ld$.\n", *player_bet);
     
-    if (*player_bet >= MAX_VALUE)
+    if (*player_bet >= max_value)
         return STOP_PLAYING;
 
-    if (make_new_offer(*player_bet)){
+    if (make_new_offer(*player_bet, max_value)){
         *user_bet = *player_bet + (rand() % NEW_OFFER_MAX_PLUS) + 1;
         printf("\nA mysterious man made a new offer: %ld$.\n", *user_bet);
         fflush(stdout);
 
-        if (*user_bet >= MAX_VALUE)
+        if (*user_bet >= max_value)
             return STOP_PLAYING;
     }
     else
@@ -117,13 +121,12 @@ void participate(){
     int8_t x = 0;
     int8_t keep_playing;
     time_t start_time;
-    char choice[128];
+    char choice[4];
     int8_t i;
-    int8_t counter;
     char auction_id[AUCTION_ID_SIZE];
 
     memset(last_bets, 0, sizeof(int64_t) * N);
-    memset(choice, 0, sizeof(char) * 128);
+    memset(choice, 0, sizeof(char) * 4);
 
     printf("Insert the auction ID: ");
     fflush(stdout);
@@ -148,7 +151,6 @@ void participate(){
     user_bet = 100 + (rand() % 50);
     keep_playing = 1;
 
-    counter = 0;
     while(time(NULL) - start_time < TIME_WINDOW && keep_playing){
         print_menu();
         read(0, choice, 128);
@@ -156,7 +158,7 @@ void participate(){
 
         switch (choice[0]) {
             case '1':
-                keep_playing = play(&player_bet, &user_bet, last_bets, &counter);
+                keep_playing = play(&player_bet, &user_bet, last_bets);
                 break;
             case '2':
                 keep_playing = STOP_PLAYING;
@@ -183,7 +185,6 @@ void participate(){
         printf("ASDASDASDASD");
     fflush(stdout);
     
-    return 0;
 }
 
 void new_auction(){
