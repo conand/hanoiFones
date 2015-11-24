@@ -16,14 +16,14 @@
 #define IMEI_SIZE 50
 
 
-double read_double(void){
+int64_t read_int64_t(void){
     char input[16];
     int size;
 
-    size = read(0, input, 15);
+    size = read(0, input, 16);
     input[15] = '\0'; 
 
-    return (double) atof(input); 
+    return (int64_t) strtol(input, NULL, 10); 
 }
 
 void rand_string(char *str, size_t size){
@@ -40,22 +40,21 @@ void rand_string(char *str, size_t size){
     }
 }
 
-int make_new_offer(int player_bet){
-    double tmp = rand() % (MAX_VALUE * 2 / 3) + MAX_VALUE / 3;
+int make_new_offer(int64_t player_bet){
+    int64_t tmp = rand() % (MAX_VALUE * 2 / 3) + MAX_VALUE / 3;
 
     return tmp > player_bet;
 }
 
-
-int play(double *player_bet, double *user_bet, double *last_bets, int8_t *counter){
+int play(int64_t *player_bet, int64_t *user_bet, int64_t *last_bets, int8_t *counter){
 
     do{
-        printf("Best offer by now is %.2f$. You have to offer more!\n", *user_bet);
+        printf("Best offer by now is %ld$. You have to offer more!\n", *user_bet);
         printf("How much do you want to offer?\n");
         fflush(stdout);
     
-        *player_bet = read_double();
-        
+        *player_bet = read_int64_t();
+
         (*counter)++;
         last_bets[*counter % N] = *player_bet;
         printf("%d - %p\n", *counter, last_bets + (*counter % N));
@@ -63,14 +62,14 @@ int play(double *player_bet, double *user_bet, double *last_bets, int8_t *counte
 
     } while(*player_bet <= *user_bet);
 
-    printf("You offered %.2f$.\n", *player_bet);
+    printf("You offered %ld$.\n", *player_bet);
     
     if (*player_bet >= MAX_VALUE)
         return STOP_PLAYING;
 
     if (make_new_offer(*player_bet)){
         *user_bet = *player_bet + (rand() % NEW_OFFER_MAX_PLUS) + 1;
-        printf("\nA mysterious man made a new offer: %.2f$.\n", *user_bet);
+        printf("\nA mysterious man made a new offer: %ld$.\n", *user_bet);
         fflush(stdout);
 
         if (*user_bet >= MAX_VALUE)
@@ -112,19 +111,32 @@ void print_menu(void){
 }
 
 void participate(){
-    double last_bets[N];
-    double player_bet;
-    double user_bet;
+    int64_t last_bets[N];
+    int64_t player_bet;
+    int64_t user_bet;
     int8_t x = 0;
     int8_t keep_playing;
     time_t start_time;
     char choice[128];
     int8_t i;
     int8_t counter;
+    char auction_id[AUCTION_ID_SIZE];
 
-    memset(last_bets, 0, sizeof(double) * N);
+    memset(last_bets, 0, sizeof(int64_t) * N);
     memset(choice, 0, sizeof(char) * 128);
-    
+
+    printf("Insert the auction ID: ");
+    fflush(stdout);
+    read(0, auction_id, AUCTION_ID_SIZE);
+    auction_id[AUCTION_ID_SIZE-1] = '\0';
+    fflush(stdin);
+
+    if( access(auction_id, F_OK) == -1 ) {
+        printf("Auction does not exits\n\n");
+        fflush(stdout);
+        return;    
+    }
+
     welcome();
     start_time = time(NULL);
 
@@ -155,15 +167,15 @@ void participate(){
     }
 
     if (player_bet > user_bet)
-        printf("\nCongratulations! You bought the (hano)iFon for %.2f$\n", player_bet);
+        printf("\nCongratulations! You bought the (hano)iFon for %ld$\n", player_bet);
     else
-        printf("\nA mysterious man bought the (hano)iFon for %.2f$\n", user_bet);
+        printf("\nA mysterious man bought the (hano)iFon for %ld$\n", user_bet);
     fflush(stdout);
 
     i = 0;
     printf("Your last bets:\n");
     while (i < N && last_bets[counter % N]){
-        printf("- %.2f\n", last_bets[counter % N]);
+        printf("- %ld\n", last_bets[counter % N]);
         counter--;
         i++;
     }
@@ -240,8 +252,7 @@ void admin_auction(){
     }
 
     fflush(stdout);
-    fclose(fp);
-    
+    fclose(fp); 
 
 }
 
