@@ -5,19 +5,19 @@
 #include <unistd.h>
 #include <string.h>
 
-#define N 17
+#define N 10
 #define TIME_WINDOW 120
-#define MAX_VALUE 160000
 #define KEEP_PLAYING 1
 #define STOP_PLAYING 0
 #define NEW_OFFER_MAX_PLUS 10
-#define STOP_PLAYING 0
-#define AUCTION_ID_SIZE 20
+#define AUCTION_ID_SIZE 16
 #define PASSWORD_SIZE 20
 #define IMEI_SIZE 50
 
 
 int8_t counter;
+time_t start_time;
+
 
 int64_t read_int64_t(void){
     char input[16];
@@ -50,8 +50,7 @@ int make_new_offer(int64_t player_bet, int64_t max_value){
 }
 
 int play(int64_t *player_bet, int64_t *user_bet, int64_t *last_bets){
-    int64_t max_value = MAX_VALUE;
-
+    
     do{
         printf("Best offer by now is %ld$. You have to offer more!\n", *user_bet);
         printf("How much do you want to offer?\n");
@@ -68,19 +67,18 @@ int play(int64_t *player_bet, int64_t *user_bet, int64_t *last_bets){
 
     printf("You offered %ld$.\n", *player_bet);
     
-    if (*player_bet >= max_value)
-        return STOP_PLAYING;
-
-    if (make_new_offer(*player_bet, max_value)){
-        *user_bet = *player_bet + (rand() % NEW_OFFER_MAX_PLUS) + 1;
+    if (time(NULL) - start_time < TIME_WINDOW){
+        //*user_bet = *player_bet + (rand() % NEW_OFFER_MAX_PLUS) + 1;
+        *user_bet = *player_bet + 1;
         printf("\nA mysterious man made a new offer: %ld$.\n", *user_bet);
-        fflush(stdout);
 
-        if (*user_bet >= max_value)
-            return STOP_PLAYING;
     }
-    else
+    else{
+        printf("Time is over!\n");    
         return STOP_PLAYING;
+    }
+
+    fflush(stdout);
 
     return KEEP_PLAYING;
 
@@ -115,19 +113,16 @@ void print_menu(void){
 }
 
 void participate(){
-    int64_t last_bets[N];
-    int64_t player_bet;
-    int64_t user_bet;
-    int8_t x = 0;
-    int8_t keep_playing;
-    time_t start_time;
-    char choice[4];
-    int8_t i;
     char auction_id[AUCTION_ID_SIZE];
+    int64_t user_bet;
+    int64_t i;
+    int64_t keep_playing;
+    int64_t player_bet;
+    char choice;
+    int64_t last_bets[N];
 
     memset(last_bets, 0, sizeof(int64_t) * N);
-    memset(choice, 0, sizeof(char) * 4);
-
+    
     printf("Insert the auction ID: ");
     fflush(stdout);
     read(0, auction_id, AUCTION_ID_SIZE);
@@ -143,7 +138,6 @@ void participate(){
     welcome();
     start_time = time(NULL);
 
-    printf("x %p\n", &x);
     printf("last_bets %p\n", last_bets);
     printf("player_bet %p\n", &player_bet);
     printf("counter %p\n", &counter);
@@ -153,10 +147,10 @@ void participate(){
 
     while(time(NULL) - start_time < TIME_WINDOW && keep_playing){
         print_menu();
-        read(0, choice, 128);
+        read(0, &choice, 1);
         fflush(stdin);
 
-        switch (choice[0]) {
+        switch (choice) {
             case '1':
                 keep_playing = play(&player_bet, &user_bet, last_bets);
                 break;
@@ -181,8 +175,6 @@ void participate(){
         counter--;
         i++;
     }
-    if (x)
-        printf("ASDASDASDASD");
     fflush(stdout);
     
 }
@@ -201,7 +193,7 @@ void new_auction(){
     fflush(stdin);
 
     rand_string(auction_id, AUCTION_ID_SIZE);
-    rand_string(passwd, PASSWORD_SIZE);
+    rand_string(passwd, PASSWORD_SIZE); //CHECK
 
     FILE *fp = fopen(auction_id, "w");
     fprintf(fp, "%s\n%s\n", passwd, imei);
@@ -259,8 +251,9 @@ void admin_auction(){
 
 int main(){
     char choice[4];
+    counter = 0;
     
-    srand(time(NULL));
+    srand(time(NULL)); //TODO make it stronger
 
     do{
         printf("1) Create new auction\n");
