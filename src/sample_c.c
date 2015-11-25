@@ -33,12 +33,12 @@ void rand_string(char *str, size_t size){
     size_t n;
 
     if (size) {
-        --size;
-        for (n = 0; n < size; n++) {
-            int key = rand() % (int) (sizeof(charset));
+        for (n = 0; n < (size-1); n++) {
+            /* sizeof charset - 1: '\0' is NOT part of the charset */
+            int key = rand() % (int) (sizeof(charset) - 1);
             str[n] = charset[key];
         }
-        str[size] = '\0';
+        str[n] = '\0';
     }
 }
 
