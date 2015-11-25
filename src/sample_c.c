@@ -21,9 +21,8 @@ time_t start_time;
 
 int64_t read_int64_t(void){
     char input[16];
-    int size;
 
-    size = read(0, input, 16);
+    read(0, input, 16);
     input[15] = '\0'; 
 
     return (int64_t) strtol(input, NULL, 10); 
@@ -220,7 +219,7 @@ void admin_auction(){
     auction_id[AUCTION_ID_SIZE-1] = '\0';
     fflush(stdin);
 
-    if (fp = fopen(auction_id, "r")){        
+    if ((fp = fopen(auction_id, "r"))){        
         fgets(correct_passwd, PASSWORD_SIZE, fp);
     
     } else {
@@ -280,4 +279,5 @@ int main(){
                 break;
         }
     }while(choice[0] != '4');
+    return 0;
 }
