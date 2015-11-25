@@ -12,10 +12,8 @@ def set_flag(ip, port, flag):
     c = pexpect.fdpexpect.fdspawn(conn.fileno())
 
     c.expect('\?:')
-    print c.after
-    print c.sendline('1')
+    c.sendline('1')
     c.expect('Insert the IMEI of the \(hano\)iFon:')
-    print c.after
     c.sendline(flag)
     c.expect('Auction ID: \w+')
     flag_id = re.search('^Auction ID: (\w+)$', c.after).group(1)
