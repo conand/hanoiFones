@@ -251,8 +251,10 @@ void admin_auction(){
 int main(){
     char choice[4];
     counter = 0;
-    
-    srand(time(NULL)); //TODO make it stronger
+    struct timespec t;
+
+    clock_gettime(CLOCK_REALTIME, &t);
+    srand(t.tv_nsec);
 
     do{
         printf("1) Create new auction\n");
