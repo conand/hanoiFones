@@ -59,15 +59,12 @@ int play(int64_t *player_bet, int64_t *user_bet, int64_t *last_bets){
 
         counter++;
         last_bets[counter % N] = *player_bet;
-        printf("%d - %p\n", counter, last_bets + (counter % N));
-        fflush(stdout);
 
     } while(*player_bet <= *user_bet);
 
     printf("You offered %ld$.\n", *player_bet);
     
     if (time(NULL) - start_time < TIME_WINDOW){
-        //*user_bet = *player_bet + (rand() % NEW_OFFER_MAX_PLUS) + 1;
         *user_bet = *player_bet + 1;
         printf("\nA mysterious man made a new offer: %ld$.\n", *user_bet);
 
@@ -136,10 +133,6 @@ void participate(){
 
     welcome();
     start_time = time(NULL);
-
-    printf("last_bets %p\n", last_bets);
-    printf("player_bet %p\n", &player_bet);
-    printf("counter %p\n", &counter);
 
     user_bet = 100 + (rand() % 50);
     keep_playing = 1;
