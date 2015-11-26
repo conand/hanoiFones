@@ -229,7 +229,7 @@ void admin_auction(){
     fflush(stdin);
 
     if (!strncmp(passwd, correct_passwd, PASSWORD_SIZE)){
-        fgets(imei, IMEI_SIZE, fp);
+        fseek(fp, 1, SEEK_CUR);
         fgets(imei, IMEI_SIZE, fp);
         printf("Your IMEI: %s\n", imei);
     }
@@ -243,7 +243,7 @@ void admin_auction(){
 }
 
 int main(){
-    char choice;
+    char choice[2];
     counter = 0;
     struct timespec t;
 
@@ -261,10 +261,10 @@ int main(){
         printf("?: \n");
         fflush(stdout);
 
-        read(0, &choice, 1);
+        read(0, choice, 2);
         fflush(stdin);
         
-        switch (choice){
+        switch (choice[0]){
             case '1':
                 new_auction();
                 break;
@@ -277,6 +277,6 @@ int main(){
             default:
                 break;
         }
-    }while(choice != '4');
+    }while(choice[0] != '4');
     return 0;
 }
