@@ -221,7 +221,7 @@ void admin_auction(){
         fgets(correct_passwd, PASSWORD_SIZE, fp);
     
     } else {
-        printf("Auction does not exists\n");
+        printf("Auction does not exist\n");
         fflush(stdout);
         return;    
     }

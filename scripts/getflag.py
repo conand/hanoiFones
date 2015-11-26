@@ -34,7 +34,7 @@ def get_flag(ip, port, flag_id, token):
     c.sendline(flag_id)
     options = [
         'Insert the password:',
-        'Auction does not exists'
+        'Auction does not exist'
     ]
     match = c.expect(options)
     if match != 0:
