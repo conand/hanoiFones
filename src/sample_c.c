@@ -21,6 +21,7 @@ time_t start_time;
 
 int64_t read_int64_t(){
     char input[16];
+    memset(input, 0, sizeof(char) * 16);
 
     read(0, input, 16);
     input[15] = '\0'; 
