@@ -129,7 +129,7 @@ void participate(){
     auction_id[AUCTION_ID_SIZE-1] = '\0';
     
     if( access(auction_id, F_OK) == -1 ) {
-        printf("Auction does not exits\n\n");
+        printf("Auction does not exists\n\n");
         fflush(stdout);
         return;    
     }
@@ -221,7 +221,7 @@ void admin_auction(){
         fgets(correct_passwd, PASSWORD_SIZE, fp);
     
     } else {
-        printf("Auction does not exits\n");
+        printf("Auction does not exists\n");
         fflush(stdout);
         return;    
     }
