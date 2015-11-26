@@ -6,10 +6,28 @@ import pexpect
 import pexpect.fdpexpect
 import re
 
-def set_flag(ip, port, flag):
+class Service:
+    def __init__(self, ip, port):
+        if ip:
+            self._conn = socket.create_connection((ip,port))
+            self.child = pexpect.fdpexpect.fdspawn(self._conn.fileno())
+        else:
+            self._conn = None
+            self.child = pexpect.spawn("../service/ro/hanoiFones")
+            self.child.logfile = sys.stdout
 
-    conn = socket.create_connection((ip,port))
-    c = pexpect.fdpexpect.fdspawn(conn.fileno())
+    def get(self):
+        return self.child
+
+    def close(self):
+        self.child.close()
+        if self._conn:
+            self._conn.close()
+
+
+def set_flag(ip, port, flag):
+    service = Service(ip, port)
+    c = service.get()
 
     c.expect('\?:')
     c.sendline('1')
@@ -20,10 +38,9 @@ def set_flag(ip, port, flag):
     c.expect('Your Password: \w+')
     password = re.search('^Your Password: (\w+)$', c.after).group(1)
     c.expect('\?:')
-    c.sendline('4')    
-    c.close()
-    
-    conn.close()
+    c.sendline('4')
+
+    service.close()
 
     return {
             'FLAG_ID': flag_id,  # Unique id for each flag
@@ -32,4 +49,5 @@ def set_flag(ip, port, flag):
 
 
 if __name__ == "__main__":
-    print set_flag('127.0.0.1', '4000', "FLG_just_testing")
+    print set_flag(None, None, "FLG_just_testing")
+
