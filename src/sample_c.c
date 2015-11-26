@@ -48,10 +48,10 @@ int make_new_offer(int64_t player_bet, int64_t max_value){
     return tmp > player_bet;
 }
 
-int play(int64_t *player_bet, int64_t *user_bet, int64_t *last_bets){
+int play(int64_t *player_bet, int64_t *server_bet, int64_t *last_bets){
     
     do{
-        printf("Best offer by now is %ld$. You have to offer more!\n", *user_bet);
+        printf("Best offer by now is %ld$. You have to offer more!\n", *server_bet);
         printf("How much do you want to offer?\n");
         fflush(stdout);
     
@@ -60,13 +60,13 @@ int play(int64_t *player_bet, int64_t *user_bet, int64_t *last_bets){
         counter++;
         last_bets[counter % N] = *player_bet;
 
-    } while(*player_bet <= *user_bet);
+    } while(*player_bet <= *server_bet);
 
     printf("You offered %ld$.\n", *player_bet);
     
     if (time(NULL) - start_time < TIME_WINDOW){
-        *user_bet = *player_bet + 1;
-        printf("\nA mysterious man made a new offer: %ld$.\n", *user_bet);
+        *server_bet = *player_bet + 1;
+        printf("\nA mysterious man made a new offer: %ld$.\n", *server_bet);
 
     }
     else{
@@ -81,8 +81,7 @@ int play(int64_t *player_bet, int64_t *user_bet, int64_t *last_bets){
 }
 
 void welcome(void){
-    printf("Hi! This is the ToH auction platform.\n");
-    printf("Today we have a wonderful (hano)iFon on sale.\n");
+    printf("Wonderful (hano)iFon on sale.\n");
     printf("You can look at the picture. Perfect conditions.\n");
     printf("\t __________\n");
     printf("\t| ________ |\n");
@@ -110,7 +109,7 @@ void print_menu(void){
 
 void participate(){
     char auction_id[AUCTION_ID_SIZE];
-    int64_t user_bet;
+    int64_t server_bet;
     int64_t i;
     int64_t keep_playing;
     int64_t player_bet;
@@ -134,7 +133,7 @@ void participate(){
     welcome();
     start_time = time(NULL);
 
-    user_bet = 100 + (rand() % 50);
+    server_bet = 100 + (rand() % 50);
     keep_playing = 1;
 
     while(time(NULL) - start_time < TIME_WINDOW && keep_playing){
@@ -144,7 +143,7 @@ void participate(){
 
         switch (choice) {
             case '1':
-                keep_playing = play(&player_bet, &user_bet, last_bets);
+                keep_playing = play(&player_bet, &server_bet, last_bets);
                 break;
             case '2':
                 keep_playing = STOP_PLAYING;
@@ -154,10 +153,12 @@ void participate(){
         }
     }
 
-    if (player_bet > user_bet)
+    if (player_bet > server_bet){
         printf("\nCongratulations! You bought the (hano)iFon for %ld$\n", player_bet);
+        printf("We will send your device together with the IMEI in a couple of days.\n");
+    }
     else
-        printf("\nA mysterious man bought the (hano)iFon for %ld$\n", user_bet);
+        printf("\nA mysterious man bought the (hano)iFon for %ld$\n", server_bet);
     fflush(stdout);
 
     i = 0;
@@ -185,7 +186,7 @@ void new_auction(){
     fflush(stdin);
 
     rand_string(auction_id, AUCTION_ID_SIZE);
-    rand_string(passwd, PASSWORD_SIZE); //CHECK
+    rand_string(passwd, PASSWORD_SIZE);
 
     FILE *fp = fopen(auction_id, "w");
     fprintf(fp, "%s\n%s\n", passwd, imei);
@@ -242,12 +243,15 @@ void admin_auction(){
 }
 
 int main(){
-    char choice[4];
+    char choice;
     counter = 0;
     struct timespec t;
 
     clock_gettime(CLOCK_REALTIME, &t);
     srand(t.tv_nsec);
+
+    printf("Hi! This is the ToH auction platform.\n");
+    printf("We have a wonderful (hano)iFones on sale.\n\n");
 
     do{
         printf("1) Create new auction\n");
@@ -257,10 +261,10 @@ int main(){
         printf("?: \n");
         fflush(stdout);
 
-        read(0, choice, 4);
+        read(0, &choice, 1);
         fflush(stdin);
         
-        switch (choice[0]){
+        switch (choice){
             case '1':
                 new_auction();
                 break;
@@ -273,6 +277,6 @@ int main(){
             default:
                 break;
         }
-    }while(choice[0] != '4');
+    }while(choice != '4');
     return 0;
 }
