@@ -1,5 +1,5 @@
 #CFLAGS += -Wall -fno-stack-protector
-all: sample_c
+all: hanoiFones
 clean:
-	rm -f sample_c
+	rm -f hanoiFones
 .PHONY: all clean
