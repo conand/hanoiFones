@@ -180,7 +180,7 @@ void new_auction(){
     memset(imei, 0, sizeof(char)*IMEI_SIZE);
     memset(passwd, 0, sizeof(char)*PASSWORD_SIZE);
 
-    printf("Insert the IMEI of the (hano)iFon:\n");
+    printf("Insert the IMEI of the (hano)iFon: ");
     fflush(stdout);
     read(0, imei, IMEI_SIZE);
     fflush(stdin);
@@ -258,7 +258,7 @@ int main(){
         printf("2) Admin your auction\n");
         printf("3) Participate in an auction\n");
         printf("4) Exit\n");
-        printf("?: \n");
+        printf("?: ");
         fflush(stdout);
 
         read(0, choice, 2);
