@@ -251,7 +251,7 @@ int main(){
     srand(t.tv_nsec);
 
     printf("Hi! This is the ToH auction platform.\n");
-    printf("We have a wonderful (hano)iFones on sale.\n\n");
+    printf("We have wonderful (hano)iFones on sale.\n\n");
 
     do{
         printf("1) Create new auction\n");
