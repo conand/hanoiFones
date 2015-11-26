@@ -19,13 +19,17 @@ int8_t counter;
 time_t start_time;
 
 
-int64_t read_int64_t(void){
+int64_t read_int64_t(){
     char input[16];
 
     read(0, input, 16);
     input[15] = '\0'; 
 
     return (int64_t) strtol(input, NULL, 10); 
+}
+
+void fflush_stdin(){
+    while ((getchar()) != '\n');
 }
 
 void rand_string(char *str, size_t size){
@@ -80,7 +84,7 @@ int play(int64_t *player_bet, int64_t *server_bet, int64_t *last_bets){
 
 }
 
-void welcome(void){
+void welcome(){
     printf("Wonderful (hano)iFon on sale.\n");
     printf("You can look at the picture. Perfect conditions.\n");
     printf("\t __________\n");
@@ -100,7 +104,7 @@ void welcome(void){
     fflush(stdout);
 }
 
-void print_menu(void){
+void print_menu(){
     printf("\n1) Make an offer\n");
     printf("2) Quit\n");
     printf("?: ");
@@ -122,8 +126,7 @@ void participate(){
     fflush(stdout);
     read(0, auction_id, AUCTION_ID_SIZE);
     auction_id[AUCTION_ID_SIZE-1] = '\0';
-    fflush(stdin);
-
+    
     if( access(auction_id, F_OK) == -1 ) {
         printf("Auction does not exits\n\n");
         fflush(stdout);
@@ -139,7 +142,7 @@ void participate(){
     while(time(NULL) - start_time < TIME_WINDOW && keep_playing){
         print_menu();
         read(0, &choice, 1);
-        fflush(stdin);
+        fflush_stdin();
 
         switch (choice) {
             case '1':
@@ -184,8 +187,7 @@ void new_auction(){
     fflush(stdout);
 
     read(0, imei, IMEI_SIZE);
-    fflush(stdin);
-
+    
     rand_string(auction_id, AUCTION_ID_SIZE);
     rand_string(passwd, PASSWORD_SIZE);
 
@@ -213,8 +215,7 @@ void admin_auction(){
     fflush(stdout);
     read(0, auction_id, AUCTION_ID_SIZE);
     auction_id[AUCTION_ID_SIZE-1] = '\0';
-    fflush(stdin);
-
+    
     if ((fp = fopen(auction_id, "r"))){        
         fgets(correct_passwd, PASSWORD_SIZE, fp);
     
@@ -228,8 +229,7 @@ void admin_auction(){
     fflush(stdout);
     read(0, passwd, PASSWORD_SIZE);
     passwd[PASSWORD_SIZE-1] = '\0';
-    fflush(stdin);
-
+    
     if (!strncmp(passwd, correct_passwd, PASSWORD_SIZE)){
         fseek(fp, 1, SEEK_CUR);
         fgets(imei, IMEI_SIZE, fp);
@@ -245,7 +245,7 @@ void admin_auction(){
 }
 
 int main(){
-    char choice[2];
+    char choice;
     counter = 0;
     struct timespec t;
 
@@ -263,10 +263,10 @@ int main(){
         printf("?: ");
         fflush(stdout);
 
-        read(0, choice, 2);
-        fflush(stdin);
+        read(0, &choice, 1);
+        fflush_stdin();
         
-        switch (choice[0]){
+        switch (choice){
             case '1':
                 new_auction();
                 break;
@@ -279,6 +279,6 @@ int main(){
             default:
                 break;
         }
-    }while(choice[0] != '4');
+    }while(choice != '4');
     return 0;
 }
