@@ -5,8 +5,8 @@ import random
 import sys
 import re
 
-MIN_BETS = 10
-MAX_BETS = 20
+MIN_BETS = 5
+MAX_BETS = 25
 MAX_INCREMENT = 15
 
 class Service:
@@ -80,7 +80,7 @@ def benign(ip, port):
         match = c.expect(options)
 
     bets_re = re.compile('^- (\d+)$')
-    for b in bets[-1:]:
+    for b in reversed(bets[-10:]):
         c.expect('- (\d+)')
         if b != int(bets_re.search(c.after).group(1)):
             service.close()
