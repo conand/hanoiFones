@@ -182,6 +182,7 @@ void new_auction(){
 
     printf("Insert the IMEI of the (hano)iFon: ");
     fflush(stdout);
+
     read(0, imei, IMEI_SIZE);
     fflush(stdin);
 
@@ -194,6 +195,7 @@ void new_auction(){
 
     printf("Auction ID: %s\n", auction_id);
     printf("Your Password: %s\n\n", passwd);
+    fflush(stdout);
 
 }
 
