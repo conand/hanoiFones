@@ -1,5 +1,6 @@
 import pexpect
 import pexpect.fdpexpect
+import socket
 import random
 import sys
 import re
@@ -33,7 +34,7 @@ def benign(ip, port):
 
     random_imei = ''.join(str(random.randint(0,9)) for x in xrange(15))
     nbets = random.randint(MIN_BETS, MAX_BETS)
-    
+
     bets = []
 
     c.expect('\?:')
@@ -43,7 +44,7 @@ def benign(ip, port):
     c.expect('Auction ID: \w+')
     auction_id = re.search('^Auction ID: (\w+)$', c.after).group(1)
     c.expect('Your Password: \w+')
-    password = re.search('^Your Password: (\w+)$', c.after).group(1)
+    # password = re.search('^Your Password: (\w+)$', c.after).group(1)
 
     c.expect('\?:')
     c.sendline('3')
@@ -77,14 +78,14 @@ def benign(ip, port):
     while match != 0:
         c.sendline('2')
         match = c.expect(options)
-    
+
     bets_re = re.compile('^- (\d+)$')
     for b in bets[-1:]:
         c.expect('- (\d+)')
         if b != int(bets_re.search(c.after).group(1)):
             service.close()
             raise Exception('Bets mismatch!')
-    
+
     c.expect('\?:')
     c.sendline('4')
     service.close()

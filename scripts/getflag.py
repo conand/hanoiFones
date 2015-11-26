@@ -40,7 +40,7 @@ def get_flag(ip, port, flag_id, token):
     if match != 0:
         service.close()
         raise Exception(options[match])
-    
+
     c.sendline(token)
     options = [
         'Your IMEI: \w+',
@@ -51,9 +51,9 @@ def get_flag(ip, port, flag_id, token):
         service.close()
         raise Exception(options[match])
     flag = re.search('^Your IMEI: (\w+)$', c.after).group(1)
+
     c.expect('\?:')
-    c.sendline('4')    
-    
+    c.sendline('4')
     service.close()
 
     return {'FLAG': flag}

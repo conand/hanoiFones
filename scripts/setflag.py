@@ -1,5 +1,3 @@
-import random
-import string
 import socket
 import sys
 import pexpect
