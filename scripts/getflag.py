@@ -9,7 +9,6 @@ class Service:
         if ip:
             self._conn = socket.create_connection((ip,port))
             self.child = pexpect.fdpexpect.fdspawn(self._conn.fileno())
-            self.child.logfile = sys.stdout
         else:
             self._conn = None
             self.child = pexpect.spawn("../service/ro/hanoiFones")
