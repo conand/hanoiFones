@@ -1,7 +1,7 @@
-architecture: ?
-service_name: ?
-type: ?
-description: ?
-flag_id_description: ?
+architecture: x86_64 
+service_name: hanoiFones
+type: console
+description: Online auction platform.
+flag_id_description: Flags are identified by the auction IDs.
 apt_dependencies: 
     - ?
