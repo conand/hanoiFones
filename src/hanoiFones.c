@@ -19,18 +19,30 @@ int8_t counter;
 time_t start_time;
 
 
+void fflush_stdin(){
+    while ((getchar()) != '\n');
+}
+
+void custom_read(char * buffer, size_t size){
+    int i;
+
+    for (i = 0; i < size - 1; i++)
+        if ((buffer[i] = getchar()) == '\n')
+            break;
+
+    if (i == size - 1)
+        fflush_stdin();
+
+    buffer[i]='\0';
+}
+
 int64_t read_int64_t(){
     char input[16];
     memset(input, 0, sizeof(char) * 16);
 
-    read(0, input, 16);
-    input[15] = '\0'; 
+    custom_read(input, 16);
 
     return (int64_t) strtol(input, NULL, 10); 
-}
-
-void fflush_stdin(){
-    while ((getchar()) != '\n');
 }
 
 void rand_string(char *str, size_t size){
@@ -125,8 +137,7 @@ void participate(){
     
     printf("Insert the auction ID: ");
     fflush(stdout);
-    read(0, auction_id, AUCTION_ID_SIZE);
-    auction_id[AUCTION_ID_SIZE-1] = '\0';
+    custom_read(auction_id, AUCTION_ID_SIZE);
     
     if( access(auction_id, F_OK) == -1 ) {
         printf("Auction does not exists\n\n");
@@ -187,7 +198,7 @@ void new_auction(){
     printf("Insert the IMEI of the (hano)iFon: ");
     fflush(stdout);
 
-    read(0, imei, IMEI_SIZE);
+    custom_read(imei, IMEI_SIZE);
     
     rand_string(auction_id, AUCTION_ID_SIZE);
     rand_string(passwd, PASSWORD_SIZE);
@@ -214,8 +225,7 @@ void admin_auction(){
 
     printf("Insert the auction ID: ");
     fflush(stdout);
-    read(0, auction_id, AUCTION_ID_SIZE);
-    auction_id[AUCTION_ID_SIZE-1] = '\0';
+    custom_read(auction_id, AUCTION_ID_SIZE);
     
     if ((fp = fopen(auction_id, "r"))){        
         fgets(correct_passwd, PASSWORD_SIZE, fp);
@@ -228,8 +238,7 @@ void admin_auction(){
 
     printf("Insert the password: ");
     fflush(stdout);
-    read(0, passwd, PASSWORD_SIZE);
-    passwd[PASSWORD_SIZE-1] = '\0';
+    custom_read(passwd, PASSWORD_SIZE);
     
     if (!strncmp(passwd, correct_passwd, PASSWORD_SIZE)){
         fseek(fp, 1, SEEK_CUR);
